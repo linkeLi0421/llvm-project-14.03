@@ -1,3 +1,4 @@
+INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR}/lib/MyProto)
 add_llvm_component_library(LLVMTransformUtils
   AddDiscriminators.cpp
   AMDGPUEmitPrintf.cpp
@@ -76,6 +77,7 @@ add_llvm_component_library(LLVMTransformUtils
   Utils.cpp
   ValueMapper.cpp
   VNCoercion.cpp
+  MyIRDumper.cpp
 
   ADDITIONAL_HEADER_DIRS
   ${LLVM_MAIN_INCLUDE_DIR}/llvm/Transforms
@@ -85,6 +87,7 @@ add_llvm_component_library(LLVMTransformUtils
   intrinsics_gen
 
   LINK_COMPONENTS
+  Myproto
   Analysis
   Core
   Support

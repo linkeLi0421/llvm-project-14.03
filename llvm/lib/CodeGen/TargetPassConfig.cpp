@@ -256,6 +256,16 @@ static cl::opt<bool> DisableExpandReductions(
     "disable-expand-reductions", cl::init(false), cl::Hidden,
     cl::desc("Disable the expand reduction intrinsics pass from running"));
 
+static cl::opt<bool> EnableMyMIRDumperPass("my-mir-dumper",
+                               cl::desc("Enable my pass for dumping "
+                                        "Machine IR information"),
+                               cl::init(false), cl::Hidden);
+
+static cl::opt<bool> EnableMyIRDumperPass("my-ir-dumper",
+                               cl::desc("Enable my pass for dumping "
+                                        "Machine IR information"),
+                               cl::init(false), cl::Hidden);
+
 /// Allow standard passes to be disabled by command line options. This supports
 /// simple binary flags that either suppress the pass or do nothing.
 /// i.e. -disable-mypass=false has no effect.
@@ -1086,6 +1096,9 @@ bool TargetPassConfig::addCoreISelPasses() {
 }
 
 bool TargetPassConfig::addISelPasses() {
+   if (EnableMyIRDumperPass)
+    addPass(createMyIRDumperPass());
+    
   if (TM->useEmulatedTLS())
     addPass(createLowerEmuTLSPass());
 

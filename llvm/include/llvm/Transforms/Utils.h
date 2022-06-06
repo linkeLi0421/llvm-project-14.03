@@ -21,6 +21,11 @@ class FunctionPass;
 class Pass;
 
 //===----------------------------------------------------------------------===//
+// createMyIRDumperPass - Dump debug info.
+//
+FunctionPass *createMyIRDumperPass();
+
+//===----------------------------------------------------------------------===//
 // createMetaRenamerPass - Rename everything with metasyntatic names.
 //
 ModulePass *createMetaRenamerPass();
