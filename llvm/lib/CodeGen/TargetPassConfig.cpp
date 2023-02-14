@@ -53,6 +53,12 @@
 
 using namespace llvm;
 
+// for alias
+// llc --alias-func-name="Function Nanme"
+static cl::opt<std::string> EnableDebugInfoDump(
+    "alias-func-name", cl::Hidden, cl::ZeroOrMore,
+    cl::desc("give aadumperPass the target function name"));
+
 static cl::opt<bool>
     EnableIPRA("enable-ipra", cl::init(false), cl::Hidden,
                cl::desc("Enable interprocedural register allocation "
@@ -1086,6 +1092,9 @@ bool TargetPassConfig::addCoreISelPasses() {
 }
 
 bool TargetPassConfig::addISelPasses() {
+  if (!EnableDebugInfoDump.empty()){
+    addPass(createAAdumperPass(EnableDebugInfoDump.c_str()));
+  }
   if (TM->useEmulatedTLS())
     addPass(createLowerEmuTLSPass());
 
