@@ -68,6 +68,7 @@
 #include "llvm/Transforms/Instrumentation/AddressSanitizerOptions.h"
 #include "llvm/Transforms/Instrumentation/BoundsChecking.h"
 #include "llvm/Transforms/Instrumentation/DataFlowSanitizer.h"
+#include "llvm/Transforms/Instrumentation/DumbSanitizer.h"
 #include "llvm/Transforms/Instrumentation/GCOVProfiler.h"
 #include "llvm/Transforms/Instrumentation/HWAddressSanitizer.h"
 #include "llvm/Transforms/Instrumentation/InstrProfiling.h"
@@ -388,6 +389,11 @@ static void addKernelMemorySanitizerPass(const PassManagerBuilder &Builder,
 static void addThreadSanitizerPass(const PassManagerBuilder &Builder,
                                    legacy::PassManagerBase &PM) {
   PM.add(createThreadSanitizerLegacyPassPass());
+}
+
+static void addDumbSanitizerPass(const PassManagerBuilder &Builder,
+                                  legacy::PassManagerBase &PM) {
+  PM.add(createDumbSanitizerLegacyPassPass());
 }
 
 static void addDataFlowSanitizerPass(const PassManagerBuilder &Builder,
@@ -834,6 +840,13 @@ void EmitAssemblyHelper::CreatePasses(legacy::PassManager &MPM,
                            addThreadSanitizerPass);
   }
 
+  if (LangOpts.Sanitize.has(SanitizerKind::Dumb)) {
+    PMBuilder.addExtension(PassManagerBuilder::EP_OptimizerLast,
+                           addDumbSanitizerPass);
+    PMBuilder.addExtension(PassManagerBuilder::EP_EnabledOnOptLevel0,
+                           addDumbSanitizerPass);
+  }
+
   if (LangOpts.Sanitize.has(SanitizerKind::DataFlow)) {
     PMBuilder.addExtension(PassManagerBuilder::EP_OptimizerLast,
                            addDataFlowSanitizerPass);
@@ -1192,6 +1205,11 @@ static void addSanitizers(const Triple &TargetTriple,
     if (LangOpts.Sanitize.has(SanitizerKind::Thread)) {
       MPM.addPass(ModuleThreadSanitizerPass());
       MPM.addPass(createModuleToFunctionPassAdaptor(ThreadSanitizerPass()));
+    }
+
+    if (LangOpts.Sanitize.has(SanitizerKind::Dumb)) {
+      MPM.addPass(ModuleDumbSanitizerPass());
+      MPM.addPass(createModuleToFunctionPassAdaptor(DumbSanitizerPass()));
     }
 
     auto ASanPass = [&](SanitizerMask Mask, bool CompileKernel) {

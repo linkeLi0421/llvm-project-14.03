@@ -1,0 +1,3 @@
+__dbsan_init
+__dbsan_read*
+__dbsan_write*
